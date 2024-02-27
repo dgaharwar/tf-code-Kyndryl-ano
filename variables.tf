@@ -59,13 +59,13 @@ variable "t_num_vcpus_per_socket" {
 variable "t_num_sockets" {
   description = "Nutanix VM vCPU's"
   type = number
-  default = <%=customOptions['inp_vcpu']%>
+  default = "<%=customOptions['inp_vcpu']%>"
 }
 
 variable "t_memory_size_mib" {
   description = "Nutanix VM vMEM"
   type = number
-  default = <%=customOptions['inp_vmem']%>
+  default = "<%=customOptions['inp_vmem']%>"
 }
 
 variable "t_disk_2_size" {
