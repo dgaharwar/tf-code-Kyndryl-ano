@@ -22,7 +22,7 @@ vm_domain               = # domain name of VM
 nutanix_endpoint        = # IP or name of Prism Central
 nutanix_cluster         = # clustername on where to deploy
 nutanix_storagecontainer_uuid    = # UUID of Storage container, didn't figure out yet how to perform in TF
-nutanix_username   # username of NTX TF integration     = # username of NTX TF integration, is also set in Cypher
+nutanix_username   = # username of NTX TF integration     = # username of NTX TF integration, is also set in Cypher
 
 # Following are variables in Cypher
 nutanix_username = # username of NTX TF integration 
