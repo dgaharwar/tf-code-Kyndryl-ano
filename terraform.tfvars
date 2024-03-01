@@ -9,8 +9,8 @@ t_ipv4_maskbits   = "24" #we need the bits in some fields
 nutanix_imagename = # link to the image
 
 t_num_vcpus_per_socket  = "1" # vcores other than 1 make CPU hot add difficult in Nutanix
-t_num_sockets           = <%=customOptions['inp_vcpu']%>
-t_memory_size_mib       = <%=customOptions['inp_vmem']%>
+t_num_sockets           = "<%=customOptions['inp_vcpu']%>"
+t_memory_size_mib       = "<%=customOptions['inp_vmem']%>"
 t_disk_2_size           = "40 * 1024 * 1024 * 1024"
 t_boot_type             = "UEFI"
 t_ipv4_nameservers      = # IP of nameserver
