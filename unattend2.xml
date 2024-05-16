@@ -1,127 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend">
-	<!-- Specialize Pass -->
-    <settings pass="specialize">
-        <component language="neutral" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <!-- OEM Information -->
-			<OEMInformation>
-                <HelpCustomized>false</HelpCustomized>
-            </OEMInformation>
-            <!-- Computer Settings -->
-            <ComputerName>${hostname}</ComputerName>
-            <TimeZone>W. Europe Standard Time</TimeZone>
-            <RegisteredOwner />
-        </component>
-        <component language="neutral" name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <DoNotOpenServerManagerAtLogon>true</DoNotOpenServerManagerAtLogon>
-        </component>
-        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <RunSynchronous>
-				<!-- Opdracht om netwerkdetectieprompt voor alle gebruikers uit te schakelen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>1</Order>
-					<Description>Netwerkdetectieprompt voor alle gebruikers uitschakelen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>reg ADD HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff /f</Path>
-				</RunSynchronousCommand>
-				<!-- Opdracht om statisch IP-adres in te stellen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>2</Order>
-					<Description>Statisch IP-adres instellen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>netsh interface ip set address name="Ethernet" static ${ipv4_address} ${ipv4_mask} ${ipv4_gateway}</Path>
-				</RunSynchronousCommand>
-				<!-- Opdracht om primaire statische DNS-server in te stellen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>3</Order>
-					<Description>Primaire statische DNS-server instellen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>netsh interface ip set dnsservers name="Ethernet" static ${ipv4_nameservers} primary</Path> 
-				</RunSynchronousCommand>
-				<!-- Opdracht om NtpServer in te schakelen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>4</Order>
-					<Description>NtpServer inschakelen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -Command "Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\w32time\TimeProviders\NtpServer' -Name 'Enabled' -Value 1"</Path>
-				</RunSynchronousCommand>
-				<!-- Opdracht om Announce Flags-waarde te configureren -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>5</Order>
-					<Description>Announce Flags-waarde configureren</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -Command "Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\w32time\Config' -Name 'AnnounceFlags' -Value 5"</Path>
-				</RunSynchronousCommand>
-				<!-- Opdracht om NtpServer te wijzigen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>6</Order>
-					<Description>NtpServer wijzigen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -Command "w32tm /config /manualpeerlist:"${ntpserver}" /syncfromflags:manual /reliable:yes /update ; Stop-Service w32time ; Start-Service w32time"</Path>
-				</RunSynchronousCommand>
-				<!-- Opdracht om CD-ROM-station uit te werpen -->
-				<RunSynchronousCommand wcm:action="add">
-					<Order>7</Order>
-					<Description>CD-ROM-station uitwerpen</Description>
-                    <Credentials>
-                        <Username>${admin_username}</Username>
-                        <Password>${admin_passwordunenc}</Password>
-                    </Credentials>
-					<Path>powershell.exe -NoProfile -Command "$driveEject = New-Object -comObject Shell.Application; $driveEject.Namespace(17).ParseName('D:').InvokeVerb('Eject')"</Path>
-				</RunSynchronousCommand>
-            </RunSynchronous>
-        </component>
-    </settings>
-	<!-- OOBE System Pass -->
-    <settings pass="oobeSystem">
-        <component language="neutral" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <!-- User Accounts -->
-			<UserAccounts>
-                <!-- Administrator Account -->
-				<AdministratorPassword>
-                    <Value>${admin_password}</Value>
-                    <PlainText>false</PlainText>
-                </AdministratorPassword>
-            </UserAccounts>
-            <!-- Hide Pages -->
-			<OOBE>
-                <HideEULAPage>true</HideEULAPage>
-                <HideLocalAccountScreen>true</HideLocalAccountScreen>
-                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
-                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-                <ProtectYourPC>1</ProtectYourPC>
-            </OOBE>
-            <!-- First Logon Commands -->
-			<FirstLogonCommands>
-            </FirstLogonCommands>
-        </component>
-		<!-- International Core Settings -->
-        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <InputLocale>en-US</InputLocale>
-            <SystemLocale>en-US</SystemLocale>
-            <UILanguage>en-US</UILanguage>
-            <UILanguageFallback>en-US</UILanguageFallback>
-            <UserLocale>nl-NL</UserLocale>
-        </component>
-    </settings>
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <settings pass="windowsPE">
+    <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <FullName></FullName>
+      </UserData>
+      <DynamicUpdate>
+        <Enable>false</Enable>
+        <WillShowUI>Never</WillShowUI>
+      </DynamicUpdate>
+      <EnableFirewall>false</EnableFirewall>
+      <LogPath>C:\Log</LogPath>
+    </component>
+  </settings>
+  <settings pass="generalize">
+    <component name="Microsoft-Windows-PnpSysprep" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <PersistAllDeviceInstalls>true</PersistAllDeviceInstalls>
+      <DoNotCleanUpNonPresentDevices>false</DoNotCleanUpNonPresentDevices>
+    </component>
+  </settings>
+  <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <SkipMachineOOBE>true</SkipMachineOOBE>
+        <SkipUserOOBE>true</SkipUserOOBE>
+        <ProtectYourPC>1</ProtectYourPC>
+        <NetworkLocation>Home</NetworkLocation>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+      </OOBE>
+      <TimeZone>W. Europe Standard Time</TimeZone>
+      <UserAccounts>
+        <AdministratorPassword>
+          <Value>${admin_password}</Value>
+          <PlainText>false</PlainText>
+        </AdministratorPassword>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Password>
+              <Value>${admin_password}</Value>
+              <PlainText>false</PlainText>
+            </Password>
+            <Group>Administrators</Group>
+            <DisplayName>Anish Abraham</DisplayName>
+            <Name>${admin_username}</Name>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+    </component>
+  </settings>
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <ComputerName>${hostname}</ComputerName>
+    </component>
+    <component name="Microsoft-Windows-TCPIP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <Interfaces>
+        <Interface wcm:action="add">
+          <Identifier>Ethernet</Identifier>
+          <Ipv4Settings>
+            <DhcpEnabled>true</DhcpEnabled>
+          </Ipv4Settings>
+        </Interface>
+      </Interfaces>
+    </component>
+    <!-- <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <RunSynchronous>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <Path>powershell -command "if (Test-Path C:\installAgent.ps1) { [System.IO.File]::Delete('C:\installAgent.ps1') }"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>2</Order>
+          <Path>powershell -command "wmic useraccount where """name='Administrator'""" set PasswordExpires=FALSE;Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope LocalMachine -Force"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>3</Order>
+          <Path>powershell -command "winrm quickconfig -q;winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="""0"""}'; winrm set winrm/config '@{MaxTimeoutms="""7200000"""}'"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>4</Order>
+          <Path>powershell -command "netsh advfirewall firewall add rule name="""WinRM 5985""" protocol=TCP dir=in localport=5985 action=allow"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>5</Order>
+          <Path>powershell -command "net stop winrm; sc.exe config winrm start=auto; net start winrm"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+      </RunSynchronous>
+    </component> -->
+  </settings>
 </unattend>
-
