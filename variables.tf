@@ -55,11 +55,11 @@ variable "t_disk_2_size" {
   type        = number
 }
 
-variable "t_boot_type" {
-  description = "Nutanix VM Boottype"
-  type        = string
-  default     = "UEFI"
-}
+#variable "t_boot_type" {
+#  description = "Nutanix VM Boottype"
+#  type        = string
+#  default     = "UEFI"
+#}
 
 
 # Windows Authentication
@@ -67,7 +67,6 @@ variable "t_admin_username" {
   description = "Admin user"
   type        = string
   sensitive   = true
-  default     = "Administrator"
 }
 
 variable "t_admin_password" {
