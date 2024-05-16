@@ -51,7 +51,7 @@ resource "nutanix_virtual_machine" "vm" {
   num_vcpus_per_socket = var.t_num_vcpus_per_socket
   num_sockets          = var.t_num_sockets
   memory_size_mib      = var.t_memory_size_mib
-  boot_type            = var.t_boot_type
+#  boot_type            = var.t_boot_type
 
   # Set NIC
   nic_list {
